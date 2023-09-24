@@ -1,4 +1,5 @@
-// You may use this file to add plugin dependencies for sbt.
-addSbtPlugin("org.spark-packages" % "sbt-spark-package" % "0.2.3")
-
-resolvers += "bintray-spark-packages" at "https://dl.bintray.com/spark-packages/maven/"
+ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+addSbtPlugin("org.jetbrains.scala" % "sbt-ide-settings" % "1.1.1")
+addSbtPlugin("org.apache.pekko" %% "pekko-grpc-sbt-plugin" % "1.0.0")
+addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.9.16")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.1")

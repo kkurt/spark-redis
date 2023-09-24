@@ -5,7 +5,8 @@ import redis.clients.jedis.{Jedis, JedisPool, JedisPoolConfig}
 
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
-import scala.collection.JavaConversions._
+import scala.collection.convert.ImplicitConversions.`map AsScala`
+import scala.jdk.CollectionConverters._
 
 
 object ConnectionPool {

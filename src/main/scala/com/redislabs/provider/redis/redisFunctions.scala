@@ -5,13 +5,14 @@ import com.redislabs.provider.redis.util.ConnectionUtils.withConnection
 import com.redislabs.provider.redis.util.PipelineUtils._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import scala.collection.JavaConversions.mapAsJavaMap
+
+import scala.jdk.CollectionConverters.MapHasAsJava
 
 /**
-  * RedisContext extends sparkContext's functionality with redis functions
-  *
-  * @param sc a spark context
-  */
+ * RedisContext extends sparkContext's functionality with redis functions
+ *
+ * @param sc a spark context
+ */
 class RedisContext(@transient val sc: SparkContext) extends Serializable {
 
   val IncorrectKeysOrKeyPatternMsg = "KeysOrKeyPattern should be String or Array[String]"
@@ -19,10 +20,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   import com.redislabs.provider.redis.RedisContext._
 
   /**
-    * @param keyPattern   a key pattern to match, or a single key
-    * @param partitionNum number of partitions
-    * @return RedisKeysRDD of simple Keys stored in redis server
-    */
+   * @param keyPattern   a key pattern to match, or a single key
+   * @param partitionNum number of partitions
+   * @return RedisKeysRDD of simple Keys stored in redis server
+   */
   def fromRedisKeyPattern(keyPattern: String = "*",
                           partitionNum: Int = 3)
                          (implicit
@@ -33,10 +34,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param keys         an array of keys
-    * @param partitionNum number of partitions
-    * @return RedisKeysRDD of simple Keys stored in redis server
-    */
+   * @param keys         an array of keys
+   * @param partitionNum number of partitions
+   * @return RedisKeysRDD of simple Keys stored in redis server
+   */
   def fromRedisKeys(keys: Array[String],
                     partitionNum: Int = 3)
                    (implicit
@@ -47,10 +48,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param keysOrKeyPattern an array of keys or a key pattern
-    * @param partitionNum     number of partitions
-    * @return RedisKVRDD of simple Key-Values stored in redis server
-    */
+   * @param keysOrKeyPattern an array of keys or a key pattern
+   * @param partitionNum     number of partitions
+   * @return RedisKVRDD of simple Key-Values stored in redis server
+   */
   def fromRedisKV[T](keysOrKeyPattern: T,
                      partitionNum: Int = 3)
                     (implicit
@@ -65,10 +66,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param keysOrKeyPattern an array of keys or a key pattern
-    * @param partitionNum     number of partitions
-    * @return RedisListRDD of related values stored in redis server
-    */
+   * @param keysOrKeyPattern an array of keys or a key pattern
+   * @param partitionNum     number of partitions
+   * @return RedisListRDD of related values stored in redis server
+   */
   def fromRedisList[T](keysOrKeyPattern: T,
                        partitionNum: Int = 3)
                       (implicit
@@ -83,10 +84,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param keysOrKeyPattern an array of keys or a key pattern
-    * @param partitionNum     number of partitions
-    * @return RedisZSetRDD of Keys in related ZSets stored in redis server
-    */
+   * @param keysOrKeyPattern an array of keys or a key pattern
+   * @param partitionNum     number of partitions
+   * @return RedisZSetRDD of Keys in related ZSets stored in redis server
+   */
   def fromRedisSet[T](keysOrKeyPattern: T,
                       partitionNum: Int = 3)
                      (implicit
@@ -101,10 +102,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param keysOrKeyPattern an array of keys or a key pattern
-    * @param partitionNum     number of partitions
-    * @return RedisHashRDD of related Key-Values stored in redis server
-    */
+   * @param keysOrKeyPattern an array of keys or a key pattern
+   * @param partitionNum     number of partitions
+   * @return RedisHashRDD of related Key-Values stored in redis server
+   */
   def fromRedisHash[T](keysOrKeyPattern: T,
                        partitionNum: Int = 3)
                       (implicit
@@ -119,10 +120,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param keysOrKeyPattern an array of keys or a key pattern
-    * @param partitionNum     number of partitions
-    * @return RedisZSetRDD of Keys in related ZSets stored in redis server
-    */
+   * @param keysOrKeyPattern an array of keys or a key pattern
+   * @param partitionNum     number of partitions
+   * @return RedisZSetRDD of Keys in related ZSets stored in redis server
+   */
   def fromRedisZSet[T](keysOrKeyPattern: T,
                        partitionNum: Int = 3)
                       (implicit
@@ -137,10 +138,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param keysOrKeyPattern an array of keys or a key pattern
-    * @param partitionNum     number of partitions
-    * @return RedisZSetRDD of related Key-Scores stored in redis server
-    */
+   * @param keysOrKeyPattern an array of keys or a key pattern
+   * @param partitionNum     number of partitions
+   * @return RedisZSetRDD of related Key-Scores stored in redis server
+   */
   def fromRedisZSetWithScore[T](keysOrKeyPattern: T,
                                 partitionNum: Int = 3)
                                (implicit
@@ -155,12 +156,12 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param keysOrKeyPattern an array of keys or a key pattern
-    * @param start            start position of target zsets
-    * @param end              end position of target zsets
-    * @param partitionNum     number of partitions
-    * @return RedisZSetRDD of Keys in related ZSets stored in redis server
-    */
+   * @param keysOrKeyPattern an array of keys or a key pattern
+   * @param start            start position of target zsets
+   * @param end              end position of target zsets
+   * @param partitionNum     number of partitions
+   * @return RedisZSetRDD of Keys in related ZSets stored in redis server
+   */
   def fromRedisZRange[T](keysOrKeyPattern: T,
                          start: Int,
                          end: Int,
@@ -177,12 +178,12 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param keysOrKeyPattern an array of keys or a key pattern
-    * @param start            start position of target zsets
-    * @param end              end position of target zsets
-    * @param partitionNum     number of partitions
-    * @return RedisZSetRDD of related Key-Scores stored in redis server
-    */
+   * @param keysOrKeyPattern an array of keys or a key pattern
+   * @param start            start position of target zsets
+   * @param end              end position of target zsets
+   * @param partitionNum     number of partitions
+   * @return RedisZSetRDD of related Key-Scores stored in redis server
+   */
   def fromRedisZRangeWithScore[T](keysOrKeyPattern: T,
                                   start: Int,
                                   end: Int,
@@ -199,12 +200,12 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param keysOrKeyPattern an array of keys or a key pattern
-    * @param min              min score of target zsets
-    * @param max              max score of target zsets
-    * @param partitionNum     number of partitions
-    * @return RedisZSetRDD of Keys in related ZSets stored in redis server
-    */
+   * @param keysOrKeyPattern an array of keys or a key pattern
+   * @param min              min score of target zsets
+   * @param max              max score of target zsets
+   * @param partitionNum     number of partitions
+   * @return RedisZSetRDD of Keys in related ZSets stored in redis server
+   */
   def fromRedisZRangeByScore[T](keysOrKeyPattern: T,
                                 min: Double,
                                 max: Double,
@@ -221,12 +222,12 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param keysOrKeyPattern an array of keys or a key pattern
-    * @param min              min score of target zsets
-    * @param max              max score of target zsets
-    * @param partitionNum     number of partitions
-    * @return RedisZSetRDD of related Key-Scores stored in redis server
-    */
+   * @param keysOrKeyPattern an array of keys or a key pattern
+   * @param min              min score of target zsets
+   * @param max              max score of target zsets
+   * @param partitionNum     number of partitions
+   * @return RedisZSetRDD of related Key-Scores stored in redis server
+   */
   def fromRedisZRangeByScoreWithScore[T](keysOrKeyPattern: T,
                                          min: Double,
                                          max: Double,
@@ -243,9 +244,9 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param kvs Pair RDD of K/V
-    * @param ttl time to live
-    */
+   * @param kvs Pair RDD of K/V
+   * @param ttl time to live
+   */
   def toRedisKV(kvs: RDD[(String, String)], ttl: Int = 0)
                (implicit
                 redisConfig: RedisConfig = RedisConfig.fromSparkConf(sc.getConf),
@@ -254,10 +255,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param kvs      Pair RDD of K/V
-    * @param hashName target hash's name which hold all the kvs
-    * @param ttl      time to live
-    */
+   * @param kvs      Pair RDD of K/V
+   * @param hashName target hash's name which hold all the kvs
+   * @param ttl      time to live
+   */
   def toRedisHASH(kvs: RDD[(String, String)], hashName: String, ttl: Int = 0)
                  (implicit
                   redisConfig: RedisConfig = RedisConfig.fromSparkConf(sc.getConf),
@@ -266,11 +267,11 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * Write RDD of (hash name, hash KVs)
-    *
-    * @param kvs RDD of tuples (hash name, Map(hash field name, hash field value))
-    * @param ttl time to live
-    */
+   * Write RDD of (hash name, hash KVs)
+   *
+   * @param kvs RDD of tuples (hash name, Map(hash field name, hash field value))
+   * @param ttl time to live
+   */
   def toRedisHASHes(kvs: RDD[(String, Map[String, String])], ttl: Int = 0)
                    (implicit
                     redisConfig: RedisConfig = RedisConfig.fromSparkConf(sc.getConf),
@@ -279,11 +280,11 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * Write RDD of (hash name, hash KVs). Values are represented as byte array.
-    *
-    * @param kvs RDD of tuples (hash name, Map(hash field name, hash field value))
-    * @param ttl time to live
-    */
+   * Write RDD of (hash name, hash KVs). Values are represented as byte array.
+   *
+   * @param kvs RDD of tuples (hash name, Map(hash field name, hash field value))
+   * @param ttl time to live
+   */
   def toRedisByteHASHes(kvs: RDD[(Array[Byte], Map[Array[Byte], Array[Byte]])], ttl: Int = 0)
                        (implicit
                         redisConfig: RedisConfig = RedisConfig.fromSparkConf(sc.getConf),
@@ -292,10 +293,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param kvs      Pair RDD of K/V
-    * @param zsetName target zset's name which hold all the kvs
-    * @param ttl      time to live
-    */
+   * @param kvs      Pair RDD of K/V
+   * @param zsetName target zset's name which hold all the kvs
+   * @param ttl      time to live
+   */
   def toRedisZSET(kvs: RDD[(String, String)], zsetName: String, ttl: Int = 0)
                  (implicit
                   redisConfig: RedisConfig = RedisConfig.fromSparkConf(sc.getConf),
@@ -304,10 +305,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param vs      RDD of values
-    * @param setName target set's name which hold all the vs
-    * @param ttl     time to live
-    */
+   * @param vs      RDD of values
+   * @param setName target set's name which hold all the vs
+   * @param ttl     time to live
+   */
   def toRedisSET(vs: RDD[String], setName: String, ttl: Int = 0)
                 (implicit
                  redisConfig: RedisConfig = RedisConfig.fromSparkConf(sc.getConf),
@@ -316,10 +317,10 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param vs       RDD of values
-    * @param listName target list's name which hold all the vs
-    * @param ttl      time to live
-    */
+   * @param vs       RDD of values
+   * @param listName target list's name which hold all the vs
+   * @param ttl      time to live
+   */
   def toRedisLIST(vs: RDD[String], listName: String, ttl: Int = 0)
                  (implicit
                   redisConfig: RedisConfig = RedisConfig.fromSparkConf(sc.getConf),
@@ -328,11 +329,11 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * Write RDD of (list name, list values) to Redis Lists.
-    *
-    * @param rdd RDD of tuples (list name, list values)
-    * @param ttl time to live
-    */
+   * Write RDD of (list name, list values) to Redis Lists.
+   *
+   * @param rdd RDD of tuples (list name, list values)
+   * @param ttl time to live
+   */
   def toRedisLISTs(rdd: RDD[(String, Seq[String])], ttl: Int = 0)
                   (implicit
                    redisConfig: RedisConfig = RedisConfig.fromSparkConf(sc.getConf),
@@ -341,12 +342,12 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * Write RDD of binary values to Redis Lists.
-    *
-    * @deprecated use toRedisByteLISTs, the method name has changed to make API consistent
-    * @param rdd RDD of tuples (list name, list values)
-    * @param ttl time to live
-    */
+   * Write RDD of binary values to Redis Lists.
+   *
+   * @deprecated use toRedisByteLISTs, the method name has changed to make API consistent
+   * @param rdd RDD of tuples (list name, list values)
+   * @param ttl time to live
+   */
   @Deprecated
   def toRedisByteLIST(rdd: RDD[(Array[Byte], Seq[Array[Byte]])], ttl: Int = 0)
                      (implicit
@@ -356,11 +357,11 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * Write RDD of binary values to Redis Lists.
-    *
-    * @param rdd RDD of tuples (list name, list values)
-    * @param ttl time to live
-    */
+   * Write RDD of binary values to Redis Lists.
+   *
+   * @param rdd RDD of tuples (list name, list values)
+   * @param ttl time to live
+   */
   def toRedisByteLISTs(rdd: RDD[(Array[Byte], Seq[Array[Byte]])], ttl: Int = 0)
                       (implicit
                        redisConfig: RedisConfig = RedisConfig.fromSparkConf(sc.getConf),
@@ -369,11 +370,11 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
   }
 
   /**
-    * @param vs       RDD of values
-    * @param listName target list's name which hold all the vs
-    * @param listSize target list's size
-    *                 save all the vs to listName(list type) in redis-server
-    */
+   * @param vs       RDD of values
+   * @param listName target list's name which hold all the vs
+   * @param listSize target list's size
+   *                 save all the vs to listName(list type) in redis-server
+   */
   def toRedisFixedLIST(vs: RDD[String],
                        listName: String,
                        listSize: Int = 0)
@@ -387,34 +388,34 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
 
 object RedisContext extends Serializable {
   /**
-    * @param arr k/vs which should be saved in the target host
-    *            save all the k/vs to the target host
-    * @param ttl time to live
-    */
+   * @param arr k/vs which should be saved in the target host
+   *            save all the k/vs to the target host
+   * @param ttl time to live
+   */
   def setKVs(arr: Iterator[(String, String)], ttl: Int, redisConfig: RedisConfig, readWriteConfig: ReadWriteConfig) {
     implicit val rwConf: ReadWriteConfig = readWriteConfig
     arr.map(kv => (redisConfig.getHost(kv._1), kv)).toArray.groupBy(_._1).
       mapValues(a => a.map(p => p._2)).foreach { x =>
-      val conn = x._1.endpoint.connect()
-      foreachWithPipeline(conn, x._2) { case (pipeline, (k, v)) =>
-        if (ttl <= 0) {
-          pipeline.set(k, v)
+        val conn = x._1.endpoint.connect()
+        foreachWithPipeline(conn, x._2) { case (pipeline, (k, v)) =>
+          if (ttl <= 0) {
+            pipeline.set(k, v)
+          }
+          else {
+            pipeline.setex(k, ttl.toLong, v)
+          }
         }
-        else {
-          pipeline.setex(k, ttl.toLong, v)
-        }
+        conn.close()
       }
-      conn.close()
-    }
   }
 
 
   /**
-    * @param hashName
-    * @param arr k/vs which should be saved in the target host
-    *            save all the k/vs to hashName(list type) to the target host
-    * @param ttl time to live
-    */
+   * @param hashName
+   * @param arr k/vs which should be saved in the target host
+   *            save all the k/vs to hashName(list type) to the target host
+   * @param ttl time to live
+   */
   def setHash(hashName: String, arr: Iterator[(String, String)], ttl: Int, redisConfig: RedisConfig,
               readWriteConfig: ReadWriteConfig) {
     implicit val rwConf: ReadWriteConfig = readWriteConfig
@@ -428,9 +429,9 @@ object RedisContext extends Serializable {
   }
 
   /**
-    * @param hashes hashName: map of k/vs to be saved in the target host
-    * @param ttl    time to live
-    */
+   * @param hashes hashName: map of k/vs to be saved in the target host
+   * @param ttl    time to live
+   */
   def setHash(hashes: Iterator[(String, Map[String, String])],
               ttl: Int,
               redisConfig: RedisConfig,
@@ -447,7 +448,7 @@ object RedisContext extends Serializable {
         withConnection(node.endpoint.connect()) { conn =>
           foreachWithPipeline(conn, arr) { (pipeline, a) =>
             val (key, hashFields) = a._2
-            pipeline.hmset(key, hashFields)
+            pipeline.hmset(key, hashFields.asJava)
             if (ttl > 0) pipeline.expire(key, ttl.toLong)
           }
         }
@@ -455,9 +456,9 @@ object RedisContext extends Serializable {
   }
 
   /**
-    * @param hashes hashName: map of k/vs to be saved in the target host
-    * @param ttl    time to live
-    */
+   * @param hashes hashName: map of k/vs to be saved in the target host
+   * @param ttl    time to live
+   */
   def setByteHash(hashes: Iterator[(Array[Byte], Map[Array[Byte], Array[Byte]])],
                   ttl: Int,
                   redisConfig: RedisConfig,
@@ -477,7 +478,7 @@ object RedisContext extends Serializable {
             withConnection(node.endpoint.connect()) { conn =>
               foreachWithPipeline(conn, arr) { (pipeline, a) =>
                 val (key, hashFields) = a._2
-                pipeline.hmset(key, hashFields)
+                pipeline.hmset(key, hashFields.asJava)
                 if (ttl > 0) pipeline.expire(key, ttl.toLong)
               }
             }
@@ -486,11 +487,11 @@ object RedisContext extends Serializable {
   }
 
   /**
-    * @param zsetName
-    * @param arr k/vs which should be saved in the target host
-    *            save all the k/vs to zsetName(zset type) to the target host
-    * @param ttl time to live
-    */
+   * @param zsetName
+   * @param arr k/vs which should be saved in the target host
+   *            save all the k/vs to zsetName(zset type) to the target host
+   * @param ttl time to live
+   */
   def setZset(zsetName: String, arr: Iterator[(String, String)], ttl: Int, redisConfig: RedisConfig,
               readWriteConfig: ReadWriteConfig) {
     implicit val rwConf: ReadWriteConfig = readWriteConfig
@@ -504,11 +505,11 @@ object RedisContext extends Serializable {
   }
 
   /**
-    * @param setName
-    * @param arr values which should be saved in the target host
-    *            save all the values to setName(set type) to the target host
-    * @param ttl time to live
-    */
+   * @param setName
+   * @param arr values which should be saved in the target host
+   *            save all the values to setName(set type) to the target host
+   * @param ttl time to live
+   */
   def setSet(setName: String, arr: Iterator[String], ttl: Int, redisConfig: RedisConfig,
              readWriteConfig: ReadWriteConfig) {
     implicit val rwConf: ReadWriteConfig = readWriteConfig
@@ -522,11 +523,11 @@ object RedisContext extends Serializable {
   }
 
   /**
-    * @param listName
-    * @param arr values which should be saved in the target host
-    *            save all the values to listName(list type) to the target host
-    * @param ttl time to live
-    */
+   * @param listName
+   * @param arr values which should be saved in the target host
+   *            save all the values to listName(list type) to the target host
+   * @param ttl time to live
+   */
   def setList(listName: String,
               arr: Iterator[String],
               ttl: Int,
@@ -590,11 +591,11 @@ object RedisContext extends Serializable {
   }
 
   /**
-    * @param key
-    * @param listSize
-    * @param arr values which should be saved in the target host
-    *            save all the values to listName(list type) to the target host
-    */
+   * @param key
+   * @param listSize
+   * @param arr values which should be saved in the target host
+   *            save all the values to listName(list type) to the target host
+   */
   def setFixedList(key: String,
                    listSize: Int,
                    arr: Iterator[String],

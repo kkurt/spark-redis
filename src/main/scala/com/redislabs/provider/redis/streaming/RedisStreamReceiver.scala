@@ -8,13 +8,14 @@ import org.apache.curator.utils.ThreadUtils
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.receiver.Receiver
 import org.sparkproject.guava.util.concurrent.RateLimiter
-import redis.clients.jedis.{Jedis, StreamEntry, StreamEntryID}
+import redis.clients.jedis.resps.StreamEntry
+import redis.clients.jedis.{Jedis, StreamEntryID}
 
-import scala.collection.JavaConversions._
+import scala.jdk.CollectionConverters._
 
 /**
-  * Receives messages from Redis Stream
-  */
+ * Receives messages from Redis Stream
+ */
 class RedisStreamReceiver(consumersConfig: Seq[ConsumerConfig],
                           redisConfig: RedisConfig,
                           readWriteConfig: ReadWriteConfig,
@@ -75,7 +76,8 @@ class RedisStreamReceiver(consumersConfig: Seq[ConsumerConfig],
         val response = jedis.xreadGroup(
           conf.groupName,
           conf.consumerName,
-          conf.batchSize,
+          conf.
+            conf.batchSize,
           conf.block,
           false,
           unackId)
@@ -137,14 +139,14 @@ class RedisStreamReceiver(consumersConfig: Seq[ConsumerConfig],
 }
 
 /**
-  * @param streamKey            redis stream key
-  * @param groupName            consumer group name
-  * @param consumerName         consumer name
-  * @param offset               stream offset
-  * @param rateLimitPerConsumer maximum retrieved messages per second per single consumer
-  * @param batchSize            maximum number of pulled items in a read API call
-  * @param block                time in milliseconds to wait for data in a blocking read API call
-  */
+ * @param streamKey            redis stream key
+ * @param groupName            consumer group name
+ * @param consumerName         consumer name
+ * @param offset               stream offset
+ * @param rateLimitPerConsumer maximum retrieved messages per second per single consumer
+ * @param batchSize            maximum number of pulled items in a read API call
+ * @param block                time in milliseconds to wait for data in a blocking read API call
+ */
 case class ConsumerConfig(streamKey: String,
                           groupName: String,
                           consumerName: String,
@@ -154,42 +156,42 @@ case class ConsumerConfig(streamKey: String,
                           block: Long = 500)
 
 /**
-  * Represents an offset in the stream
-  */
+ * Represents an offset in the stream
+ */
 sealed trait Offset
 
 /**
-  * Latest offset, known as a '$' special id
-  */
+ * Latest offset, known as a '$' special id
+ */
 case object Latest extends Offset
 
 /**
-  * Earliest offset, '0-0' id
-  */
+ * Earliest offset, '0-0' id
+ */
 case object Earliest extends Offset
 
 /**
-  * Specific id in the form of 'v1-v2'
-  *
-  * @param v1 first token of the id
-  * @param v2 second token of the id
-  */
+ * Specific id in the form of 'v1-v2'
+ *
+ * @param v1 first token of the id
+ * @param v2 second token of the id
+ */
 case class IdOffset(v1: Long, v2: Long) extends Offset
 
 /**
-  * Item id in the form of 'v1-v2'
-  *
-  * @param v1 first token of the id
-  * @param v2 second token of the id
-  */
+ * Item id in the form of 'v1-v2'
+ *
+ * @param v1 first token of the id
+ * @param v2 second token of the id
+ */
 case class ItemId(v1: Long, v2: Long)
 
 /**
-  * Represent an item in the stream
-  *
-  * @param streamKey stream key
-  * @param id        item(entry) id
-  * @param fields    key/value map of item fields
-  */
+ * Represent an item in the stream
+ *
+ * @param streamKey stream key
+ * @param id        item(entry) id
+ * @param fields    key/value map of item fields
+ */
 case class StreamItem(streamKey: String, id: ItemId, fields: Map[String, String])
 

@@ -1,25 +1,24 @@
 package com.redislabs.provider.redis
 
-import java.net.URI
-
 import org.apache.spark.SparkConf
 import redis.clients.jedis.util.{JedisClusterCRC16, JedisURIHelper, SafeEncoder}
 import redis.clients.jedis.{Jedis, Protocol}
 
-import scala.collection.JavaConversions._
+import java.net.URI
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 
 /**
-  * RedisEndpoint represents a redis connection endpoint info: host, port, auth password
-  * db number, timeout and ssl mode
-  *
-  * @param host  the redis host or ip
-  * @param port  the redis port
-  * @param user  the authentication username
-  * @param auth  the authentication password
-  * @param dbNum database number (should be avoided in general)
-  * @param ssl true to enable SSL connection. Defaults to false
-  */
+ * RedisEndpoint represents a redis connection endpoint info: host, port, auth password
+ * db number, timeout and ssl mode
+ *
+ * @param host  the redis host or ip
+ * @param port  the redis port
+ * @param user  the authentication username
+ * @param auth  the authentication password
+ * @param dbNum database number (should be avoided in general)
+ * @param ssl   true to enable SSL connection. Defaults to false
+ */
 case class RedisEndpoint(host: String = Protocol.DEFAULT_HOST,
                          port: Int = Protocol.DEFAULT_PORT,
                          user: String = null,
@@ -30,10 +29,10 @@ case class RedisEndpoint(host: String = Protocol.DEFAULT_HOST,
   extends Serializable {
 
   /**
-    * Constructor from spark config. set params with spark.redis.host, spark.redis.port, spark.redis.auth, spark.redis.db and spark.redis.ssl
-    *
-    * @param conf spark context config
-    */
+   * Constructor from spark config. set params with spark.redis.host, spark.redis.port, spark.redis.auth, spark.redis.db and spark.redis.ssl
+   *
+   * @param conf spark context config
+   */
   def this(conf: SparkConf) {
     this(
       conf.get("spark.redis.host", Protocol.DEFAULT_HOST),
@@ -50,7 +49,7 @@ case class RedisEndpoint(host: String = Protocol.DEFAULT_HOST,
   /**
    * Constructor from spark config and parameters.
    *
-   * @param conf spark context config
+   * @param conf       spark context config
    * @param parameters source specific parameters
    */
   def this(conf: SparkConf, parameters: Map[String, String]) {
@@ -66,37 +65,37 @@ case class RedisEndpoint(host: String = Protocol.DEFAULT_HOST,
 
 
   /**
-    * Constructor with Jedis URI
-    *
-    * @param uri connection URI in the form of redis://$user:$password@$host:$port/[dbnum]. Use "rediss://" scheme for redis SSL
-    */
+   * Constructor with Jedis URI
+   *
+   * @param uri connection URI in the form of redis://$user:$password@$host:$port/[dbnum]. Use "rediss://" scheme for redis SSL
+   */
   def this(uri: URI) {
     this(uri.getHost, uri.getPort, JedisURIHelper.getUser(uri), JedisURIHelper.getPassword(uri), JedisURIHelper.getDBIndex(uri),
       Protocol.DEFAULT_TIMEOUT, uri.getScheme == RedisSslScheme)
   }
 
   /**
-    * Constructor with Jedis URI from String
-    *
-    * @param uri connection URI in the form of redis://$user:$password@$host:$port/[dbnum]. Use "rediss://" scheme for redis SSL
-    */
+   * Constructor with Jedis URI from String
+   *
+   * @param uri connection URI in the form of redis://$user:$password@$host:$port/[dbnum]. Use "rediss://" scheme for redis SSL
+   */
   def this(uri: String) {
     this(URI.create(uri))
   }
 
   /**
-    * Connect tries to open a connection to the redis endpoint,
-    * optionally authenticating and selecting a db
-    *
-    * @return a new Jedis instance
-    */
+   * Connect tries to open a connection to the redis endpoint,
+   * optionally authenticating and selecting a db
+   *
+   * @return a new Jedis instance
+   */
   def connect(): Jedis = {
     ConnectionPool.connect(this)
   }
 
   /**
-    * @return config with masked password. Used for logging.
-    */
+   * @return config with masked password. Used for logging.
+   */
   def maskPassword(): RedisEndpoint = {
     this.copy(auth = "")
   }
@@ -113,20 +112,20 @@ case class RedisNode(endpoint: RedisEndpoint,
 }
 
 /**
-  * Tuning options for read and write operations.
-  */
+ * Tuning options for read and write operations.
+ */
 case class ReadWriteConfig(scanCount: Int, maxPipelineSize: Int, rddWriteIteratorGroupingSize: Int)
 
 object ReadWriteConfig {
-  /** maximum number of commands per pipeline **/
+  /** maximum number of commands per pipeline * */
   val MaxPipelineSizeConfKey = "spark.redis.max.pipeline.size"
   val MaxPipelineSizeDefault = 100
 
-  /** count option of SCAN command **/
+  /** count option of SCAN command * */
   val ScanCountConfKey = "spark.redis.scan.count"
   val ScanCountDefault = 100
 
-  /** Iterator grouping size for writing RDD **/
+  /** Iterator grouping size for writing RDD * */
   val RddWriteIteratorGroupingSizeKey = "spark.redis.rdd.write.iterator.grouping.size"
   val RddWriteIteratorGroupingSizeDefault = 1000
 
@@ -144,8 +143,8 @@ object ReadWriteConfig {
 object RedisConfig {
 
   /**
-    * create redis config from spark config
-    */
+   * create redis config from spark config
+   */
   def fromSparkConf(conf: SparkConf): RedisConfig = {
     new RedisConfig(new RedisEndpoint(conf))
   }
@@ -156,9 +155,9 @@ object RedisConfig {
 }
 
 /**
-  * RedisConfig holds the state of the cluster nodes, and uses consistent hashing to map
-  * keys to nodes
-  */
+ * RedisConfig holds the state of the cluster nodes, and uses consistent hashing to map
+ * keys to nodes
+ */
 class RedisConfig(val initialHost: RedisEndpoint) extends Serializable {
 
   val initialAddr: String = initialHost.host
@@ -167,15 +166,15 @@ class RedisConfig(val initialHost: RedisEndpoint) extends Serializable {
   val nodes: Array[RedisNode] = getNodes(initialHost)
 
   /**
-    * @return initialHost's auth
-    */
+   * @return initialHost's auth
+   */
   def getAuth: String = {
     initialHost.auth
   }
 
   /**
-    * @return selected db number
-    */
+   * @return selected db number
+   */
   def getDB: Int = {
     initialHost.dbNum
   }
@@ -186,10 +185,10 @@ class RedisConfig(val initialHost: RedisEndpoint) extends Serializable {
   }
 
   /**
-    * @param sPos start slot number
-    * @param ePos end slot number
-    * @return a list of RedisNode whose slots union [sPos, ePos] is not null
-    */
+   * @param sPos start slot number
+   * @param ePos end slot number
+   * @return a list of RedisNode whose slots union [sPos, ePos] is not null
+   */
   def getNodesBySlots(sPos: Int, ePos: Int): Array[RedisNode] = {
     /* This function judges if [sPos1, ePos1] union [sPos2, ePos2] is not null */
     def inter(sPos1: Int, ePos1: Int, sPos2: Int, ePos2: Int) =
@@ -200,29 +199,29 @@ class RedisConfig(val initialHost: RedisEndpoint) extends Serializable {
   }
 
   /**
-    * *IMPORTANT* Please remember to close after using
-    *
-    * @param key
-    * @return jedis that is a connection for a given key
-    */
+   * *IMPORTANT* Please remember to close after using
+   *
+   * @param key
+   * @return jedis that is a connection for a given key
+   */
   def connectionForKey(key: String): Jedis = {
     getHost(key).connect()
   }
 
   /**
-    * *IMPORTANT* Please remember to close after using
-    *
-    * @param key
-    * @return jedis is a connection for a given key
-    */
+   * *IMPORTANT* Please remember to close after using
+   *
+   * @param key
+   * @return jedis is a connection for a given key
+   */
   def connectionForKey(key: Array[Byte]): Jedis = {
     getHost(key).connect()
   }
 
   /**
-    * @param initialHost any redis endpoint of a cluster or a single server
-    * @return true if the target server is in cluster mode
-    */
+   * @param initialHost any redis endpoint of a cluster or a single server
+   * @return true if the target server is in cluster mode
+   */
   private def clusterEnabled(initialHost: RedisEndpoint): Boolean = {
     val conn = initialHost.connect()
     val info = conn.info.split("\n")
@@ -235,18 +234,18 @@ class RedisConfig(val initialHost: RedisEndpoint) extends Serializable {
   }
 
   /**
-    * @param key
-    * @return host whose slots should involve key
-    */
+   * @param key
+   * @return host whose slots should involve key
+   */
   def getHost(key: String): RedisNode = {
     val slot = JedisClusterCRC16.getSlot(key)
     getHostBySlot(slot)
   }
 
   /**
-    * @param key
-    * @return host whose slots should involve key
-    */
+   * @param key
+   * @return host whose slots should involve key
+   */
   def getHost(key: Array[Byte]): RedisNode = {
     val slot = JedisClusterCRC16.getSlot(key)
     getHostBySlot(slot)
@@ -260,17 +259,17 @@ class RedisConfig(val initialHost: RedisEndpoint) extends Serializable {
 
 
   /**
-    * @param initialHost any redis endpoint of a cluster or a single server
-    * @return list of host nodes
-    */
+   * @param initialHost any redis endpoint of a cluster or a single server
+   * @return list of host nodes
+   */
   private def getHosts(initialHost: RedisEndpoint): Array[RedisNode] = {
     getNodes(initialHost).filter(_.idx == 0)
   }
 
   /**
-    * @param initialHost any redis endpoint of a single server
-    * @return list of nodes
-    */
+   * @param initialHost any redis endpoint of a single server
+   * @return list of nodes
+   */
   private def getNonClusterNodes(initialHost: RedisEndpoint): Array[RedisNode] = {
     val master = (initialHost.host, initialHost.port)
     val conn = initialHost.connect()
@@ -320,12 +319,12 @@ class RedisConfig(val initialHost: RedisEndpoint) extends Serializable {
   }
 
   /**
-    * @param initialHost any redis endpoint of a cluster server
-    * @return list of nodes
-    */
+   * @param initialHost any redis endpoint of a cluster server
+   * @return list of nodes
+   */
   private def getClusterNodes(initialHost: RedisEndpoint): Array[RedisNode] = {
     val conn = initialHost.connect()
-    val res = conn.clusterSlots().flatMap {
+    val res = conn.clusterSlots().asScala.flatMap {
       slotInfoObj => {
         val slotInfo = slotInfoObj.asInstanceOf[java.util.List[java.lang.Object]]
         val sPos = slotInfo.get(0).toString.toInt
@@ -340,7 +339,7 @@ class RedisConfig(val initialHost: RedisEndpoint) extends Serializable {
          * filter master.
          */
         (0 until (slotInfo.size - 2)).map(i => {
-          val node = slotInfo(i + 2).asInstanceOf[java.util.List[java.lang.Object]]
+          val node = slotInfo.get(i + 2).asInstanceOf[java.util.List[java.lang.Object]]
           val host = SafeEncoder.encode(node.get(0).asInstanceOf[Array[scala.Byte]])
           val port = node.get(1).toString.toInt
           val endpoint = RedisEndpoint(
@@ -360,9 +359,9 @@ class RedisConfig(val initialHost: RedisEndpoint) extends Serializable {
   }
 
   /**
-    * @param initialHost any redis endpoint of a cluster or a single server
-    * @return list of nodes
-    */
+   * @param initialHost any redis endpoint of a cluster or a single server
+   * @return list of nodes
+   */
   def getNodes(initialHost: RedisEndpoint): Array[RedisNode] = {
     if (clusterEnabled(initialHost)) {
       getClusterNodes(initialHost)
