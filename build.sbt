@@ -9,7 +9,7 @@ lazy val root = (project in file("."))
   )
 
 Compile / scalacOptions ++= Seq(
-  "-release:11",
+  "-target:11",
   "-deprecation",
   "-feature",
   "-unchecked",
@@ -19,9 +19,7 @@ Compile / doc := file("")
 Compile / run / fork := true
 javaOptions ++= Seq("-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005")
 Compile / javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
-Compile / javaOptions ++= Seq("-Dconfig.resource=dev1.conf",
-  "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"
-)
+Compile / javaOptions ++= Seq("--add-opens=java.base/sun.nio.ch=ALL-UNNAMED")
 
 Test / parallelExecution := false
 Test / testOptions += Tests.Argument("-oDF")
