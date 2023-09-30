@@ -8,11 +8,11 @@ import redis.clients.jedis.Jedis
 import redis.clients.jedis.commands.ProtocolCommand
 import redis.clients.jedis.util.SafeEncoder
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
-  * @author The Viet Nguyen
-  */
+ * @author The Viet Nguyen
+ */
 object ConnectionUtils {
 
   def withConnection[A](conn: Jedis)(body: Jedis => A): A = {
@@ -24,10 +24,11 @@ object ConnectionUtils {
   }
 
   def withConnection[A](streamKey: String)(body: Jedis => A)(implicit redisConfig: RedisConfig): A = {
-    withConnection(redisConfig.connectionForKey(streamKey)){
+    withConnection(redisConfig.connectionForKey(streamKey)) {
       body
     }
   }
+
 
   implicit class JedisExt(val jedis: Jedis) extends AnyVal {
 
@@ -36,13 +37,21 @@ object ConnectionUtils {
       val client = jedis.getClient
       val combinedArgs = command +: args
       client.sendCommand(XINFO, combinedArgs: _*)
-      val response = asList(client.getOne).asScala
+
+      val response = client.getOne.asInstanceOf[java.util.List[_]].asScala.toList
+
+      def asScalaMap(javaMap: java.util.Map[_, _]): Map[String, Any] =
+        javaMap.asScala.toMap.map { case (k, v) => (k.toString, v) }
+
       command match {
         case SubCommandStream =>
-          asMap(response)
+          asScalaMap(response.head.asInstanceOf[java.util.Map[_, _]])
         case SubCommandGroups =>
-          response.map(m => asList(m)).map(_.asScala).map(asMap)
-            .map(m => String.valueOf(m("name")) -> m).toMap
+          response.collect {
+            case m: java.util.Map[_, _] =>
+              val scalaMap = asScalaMap(m)
+              scalaMap("name").toString -> scalaMap
+          }.toMap
       }
     }
 

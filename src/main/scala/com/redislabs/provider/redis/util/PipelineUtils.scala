@@ -11,17 +11,17 @@ import scala.collection.{TraversableOnce, mutable}
 object PipelineUtils {
 
   /**
-    * Executes a pipeline function for each item in the sequence, returns the server response.
-    *
-    * Ensures that a new pipeline is created if the number of operations exceeds the given maxPipelineSize
-    * while iterating over the items.
-    *
-    * @param conn            jedis connection
-    * @param readWriteConfig read/write config
-    * @param items           a sequence of elements (typically keys)
-    * @param f               function to applied for each item in the sequence
-    * @return response from the server
-    */
+   * Executes a pipeline function for each item in the sequence, returns the server response.
+   *
+   * Ensures that a new pipeline is created if the number of operations exceeds the given maxPipelineSize
+   * while iterating over the items.
+   *
+   * @param conn            jedis connection
+   * @param readWriteConfig read/write config
+   * @param items           a sequence of elements (typically keys)
+   * @param f               function to applied for each item in the sequence
+   * @return response from the server
+   */
   def mapWithPipeline[A](conn: Jedis, items: TraversableOnce[A])(f: (Pipeline, A) => Unit)
                         (implicit readWriteConfig: ReadWriteConfig): Seq[AnyRef] = {
     val totalResp = mutable.ListBuffer[JList[AnyRef]]()
@@ -45,20 +45,20 @@ object PipelineUtils {
       totalResp += resp
     }
 
-    totalResp.flatMap(_.asScala)
+    totalResp.flatMap(_.asScala).toSeq
   }
 
   /**
-    * Executes a pipeline function for each item in the sequence. No response is returned.
-    *
-    * Ensures that a new pipeline is created if the number of operations exceeds the given maxPipelineSize
-    * while iterating over the items.
-    *
-    * @param conn            jedis connection
-    * @param readWriteConfig read/write config
-    * @param items           a sequence of elements (typically keys)
-    * @param f               function to applied for each item in the sequence
-    */
+   * Executes a pipeline function for each item in the sequence. No response is returned.
+   *
+   * Ensures that a new pipeline is created if the number of operations exceeds the given maxPipelineSize
+   * while iterating over the items.
+   *
+   * @param conn            jedis connection
+   * @param readWriteConfig read/write config
+   * @param items           a sequence of elements (typically keys)
+   * @param f               function to applied for each item in the sequence
+   */
   def foreachWithPipeline[A](conn: Jedis, items: TraversableOnce[A])(f: (Pipeline, A) => Unit)
                             (implicit readWriteConfig: ReadWriteConfig): Unit = {
     // iterate over items and create new pipelines periodically
@@ -80,19 +80,19 @@ object PipelineUtils {
   }
 
   /**
-    * Executes a pipeline function for each item in the sequence. Doesn't sync and return the last pipeline after
-    * all operations are executed. Allows to execute more operations with the returned pipeline.
-    * The client is responsible of syncing the returned pipeline.
-    *
-    * Ensures that a new pipeline is created if the number of operations exceeds the given maxPipelineSize
-    * while iterating over the items.
-    *
-    * @param conn            jedis connection
-    * @param readWriteConfig read/write config
-    * @param items           a sequence of elements (typically keys)
-    * @param f               function to applied for each item in the sequence
-    * @return the last pipeline
-    */
+   * Executes a pipeline function for each item in the sequence. Doesn't sync and return the last pipeline after
+   * all operations are executed. Allows to execute more operations with the returned pipeline.
+   * The client is responsible of syncing the returned pipeline.
+   *
+   * Ensures that a new pipeline is created if the number of operations exceeds the given maxPipelineSize
+   * while iterating over the items.
+   *
+   * @param conn            jedis connection
+   * @param readWriteConfig read/write config
+   * @param items           a sequence of elements (typically keys)
+   * @param f               function to applied for each item in the sequence
+   * @return the last pipeline
+   */
   def foreachWithPipelineNoLastSync[A](conn: Jedis, items: TraversableOnce[A])(f: (Pipeline, A) => Unit)
                                       (implicit readWriteConfig: ReadWriteConfig): Pipeline = {
     // iterate over items and create new pipelines periodically

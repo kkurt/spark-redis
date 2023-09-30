@@ -33,10 +33,10 @@ Global / cancelable := false // ctrl-c
 lazy val props = new {
   val projectBuildSourceEncoding = "UTF-8"
   val projectReportingOutputEncoding = "UTF-8"
-  val javaVersion = "1.8"
+  val javaVersion = "11"
   val scalaMajorVersion = "2.13"
   val scalaCompleteVersion = "2.13.12"
-  val jedisVersion = "5.0.0"
+  val jedisVersion = "3.9.0"
   val pluginsScalatestVersion = "1.0"
 
 }

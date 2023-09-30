@@ -2,7 +2,6 @@ package org.apache.spark.sql.redis.stream
 
 import java.io.File
 import java.util.UUID
-
 import com.redislabs.provider.redis.RedisConfig
 import com.redislabs.provider.redis.env.Env
 import com.redislabs.provider.redis.util.ConnectionUtils.{JedisExt, XINFO, withConnection}
@@ -16,10 +15,11 @@ import redis.clients.jedis.StreamEntryID
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.DurationLong
+import scala.language.postfixOps
 
 /**
-  * @author The Viet Nguyen
-  */
+ * @author The Viet Nguyen
+ */
 trait RedisStreamSourceSuite extends FunSuite with Matchers with Env with Logging {
 
   val AutoEntryId: StreamEntryID = new StreamEntryID() {
